@@ -1,15 +1,30 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Repository;
 
 use App\Entity\Department;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
-class DepartmentRepository extends ServiceEntityRepository
+final readonly class DepartmentRepository 
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityRepository $repository;
+
+    function __construct
+    (
+        private EntityManagerInterface $entityManager
+    )
     {
-        parent::__construct($registry, Department::class);
+        $this->repository = $this->entityManager->getRepository(Department::class);
+    }
+    
+    public function find(int $id): ?Department {
+        return $this->repository->find($id);
+    }
+
+    public function save(Department $department): void {
+        $this->entityManager->persist($department);
+        $this->entityManager->flush();
     }
 }

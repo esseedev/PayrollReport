@@ -1,20 +1,25 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Repository;
 
 use App\Entity\Employee;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
-class EmployeeRepository extends ServiceEntityRepository
+final readonly class EmployeeRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityRepository $repository;
+    public function __construct
+    (
+        private EntityManagerInterface $entityManager
+    )
     {
-        parent::__construct($registry, Employee::class);
+        $this->repository = $this->entityManager->getRepository(Employee::class);
     }
     
-    public function findByFilters(?string $department = null, ?string $name = null, $lastName = null): array {
+    public function findByFilters(?string $department = null, ?string $name = null, $lastName = null, ?string $sortBy = null, string $sortOrder = 'asc'): array {
        $criteria = Criteria::create();
        
        if ($department) {
@@ -29,6 +34,22 @@ class EmployeeRepository extends ServiceEntityRepository
            $criteria->andWhere(Criteria::expr()->contains('lastname', $lastName));
        }
        
-       return $this->matching($criteria)->toArray();
+       if ($sortBy) {
+           $criteria->orderBy([$this->getSortField($sortBy) => $sortOrder]);
+       }
+       
+       return $this->repository->matching($criteria)->toArray();
+    }
+    
+    public function save(Employee $employee): void {
+        $this->entityManager->persist($employee);
+        $this->entityManager->flush();
+    }
+    
+    private function getSortField(string $sortBy): string {
+        return match ($sortBy) {
+            'department' => 'department.name',
+            default => $sortBy
+        };
     }
 }

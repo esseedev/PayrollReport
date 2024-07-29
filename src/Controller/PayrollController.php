@@ -1,18 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Query\GetCompanyPayrollReportQuery;
 use App\Query\GetCompanyPayrollReportQueryHandler;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PayrollController extends AbstractController
+#[AsController]
+final readonly class PayrollController
 {
+    
+    public function __construct(private GetCompanyPayrollReportQueryHandler $queryHandler) { }
+    
     #[Route('/payroll-report', name:'payroll_report', methods: ['GET'])]
-    public function getPayrollReport(Request $request, GetCompanyPayrollReportQueryHandler $queryHandler): JsonResponse {
+    public function getPayrollReport(Request $request): JsonResponse {
         $query = new GetCompanyPayrollReportQuery(
             sortBy: $request->query->get('sortBy'),
             filterDepartment: $request->query->get('filterDepartment'),
@@ -20,7 +25,7 @@ class PayrollController extends AbstractController
             filterLastName: $request->query->get('filterLastName')
         );
 
-        $report = $queryHandler($query);
+        $report = ($this->queryHandler)($query);
 
         return $this->json($report);
     }

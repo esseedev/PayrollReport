@@ -1,35 +1,35 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
 use App\Command\CreateDepartmentCommand;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-class DepartmentController extends AbstractController
+#[AsController]
+final readonly class DepartmentController 
 {
     public function __construct
     (
-        private MessageBusInterface $commandBus
+        private MessageBusInterface $commandBus,
     ) { }
     
     #[Route('/department', name: 'department', methods: ['POST'])]
-    public function createDepartment(Request $request): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-        
-        $command = new CreateDepartmentCommand(
-            name: $data['name'],
-            isPercentageBased:  $data['isPercentageBased'],
-            supplementPercentage: $data['supplementPercentage'],
-        );
-        
-        $this->commandBus->dispatch($command);
-        
-        return new JsonResponse(['message' => 'Department created successfully'], Response::HTTP_CREATED);
+    public function createDepartment(#[MapRequestPayload] CreateDepartmentCommand $command): JsonResponse {
+        try {
+            $this->commandBus->dispatch($command);
+            return new JsonResponse(['message' => 'Department created successfully'], Response::HTTP_CREATED);
+        } catch (Exception $exception) {
+            return new JsonResponse(
+                ['message' => sprintf('Error creating department: %s', $exception->getMessage())],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
-
 }
