@@ -26,6 +26,6 @@ final readonly class PayrollController
 
         $report = $this->queryHandler->execute($query);
 
-        return $this->json($report);
+        return new JsonResponse($report);
     }
 }
