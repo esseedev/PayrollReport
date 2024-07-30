@@ -12,6 +12,7 @@ class SalaryCalculatorService
         $department = $employee->getDepartment();
 
         if ($department->isPercentageBased()) {
+            //TODO: Wyjeb supplement powtorzenie
             $supplement = $wageBase * ($department->getSupplementPercentage() / 100);
         } else {
             $yearsOfService = min($employee->getYearsOfService(), 10);

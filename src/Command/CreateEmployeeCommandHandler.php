@@ -12,7 +12,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 
 #[AsMessageHandler]
-class CreateEmployeeCommandHandler
+final readonly class CreateEmployeeCommandHandler
 {
     public function __construct
     (

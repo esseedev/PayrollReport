@@ -7,7 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CreateEmployeeCommand
+final readonly class CreateEmployeeCommand
 {
     public function __construct
     (
