@@ -26,10 +26,7 @@ final readonly class DepartmentController
             $this->commandBus->dispatch($command);
             return new JsonResponse(['message' => 'Department created successfully'], Response::HTTP_CREATED);
         } catch (Exception $exception) {
-            return new JsonResponse(
-                ['message' => sprintf('Error creating department: %s', $exception->getMessage())],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
+            return new JsonResponse(['message' => 'Something went wrong.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

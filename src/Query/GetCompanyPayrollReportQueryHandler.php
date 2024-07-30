@@ -17,23 +17,20 @@ class GetCompanyPayrollReportQueryHandler
         private SalaryCalculatorService $salaryCalculator,
     ) {}
     
-    public function __invoke(GetCompanyPayrollReportQuery $query):array {
-        $startMemory = memory_get_usage(true);
-        error_log("Handler start memory usage: " . $startMemory);
-        
+    public function __invoke(GetCompanyPayrollReportQuery $query): array
+    {
+        return $this->execute($query); //Symfony MessageHandler expects an __invoke method :(
+    }
+
+    public function execute(GetCompanyPayrollReportQuery $query):array {
         $employees = $this->employeeRepository->findByFilters(
             department: $query->filterDepartment,
             name: $query->filterName,
             lastName: $query->filterLastName,
             sortBy: $query->sortBy,
-            sortOrder: $query->sortOrder ?? 'ASC'
         );
-        
-        $afterQueryMemory = memory_get_usage(true);
-        error_log("After query memory usage: " . $afterQueryMemory);
-        error_log("Query memory difference: " . ($afterQueryMemory - $startMemory));
-        
-        $result = array_map(function (Employee $employee) {
+
+        return array_map(function (Employee $employee) {
             $totalSalary = $this->salaryCalculator->calculateSalary($employee);
             $supplement = $this->salaryCalculator->calculateSupplement($employee);
             
@@ -47,11 +44,5 @@ class GetCompanyPayrollReportQueryHandler
                 'totalSalary' => $totalSalary,
             ];
         }, $employees);
-        
-        $endMemory = memory_get_usage(true);
-        error_log("Handler end memory usage: " . $endMemory);
-        error_log("Handler total memory difference: " . ($endMemory - $startMemory));
-
-        return $result;
     }
 }

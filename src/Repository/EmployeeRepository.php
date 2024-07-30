@@ -18,6 +18,10 @@ final readonly class EmployeeRepository
     {
         $this->repository = $this->entityManager->getRepository(Employee::class);
     }
+
+    public function find(int $id): ?Employee {
+        return $this->repository->find($id);
+    }
     
     public function findByFilters(?string $department = null, ?string $name = null, $lastName = null, ?string $sortBy = null, string $sortOrder = 'asc'): array {
        $criteria = Criteria::create();

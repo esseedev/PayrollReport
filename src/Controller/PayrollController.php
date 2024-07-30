@@ -13,7 +13,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 final readonly class PayrollController
 {
-    
     public function __construct(private GetCompanyPayrollReportQueryHandler $queryHandler) { }
     
     #[Route('/payroll-report', name:'payroll_report', methods: ['GET'])]
@@ -25,7 +24,7 @@ final readonly class PayrollController
             filterLastName: $request->query->get('filterLastName')
         );
 
-        $report = ($this->queryHandler)($query);
+        $report = $this->queryHandler->execute($query);
 
         return $this->json($report);
     }

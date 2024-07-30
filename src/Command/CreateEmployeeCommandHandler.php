@@ -5,6 +5,7 @@ namespace App\Command;
 
 use App\Entity\Department;
 use App\Entity\Employee;
+use App\Repository\DepartmentRepository;
 use App\Repository\EmployeeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -15,13 +16,13 @@ class CreateEmployeeCommandHandler
 {
     public function __construct
     (
-        private EntityManagerInterface $entityManager,
         private EmployeeRepository $employeeRepository,
+        private DepartmentRepository $departmentRepository,
     )
     { }
     
-    public function __invoke(CreateEmployeeCommand $command) {
-        $department = $this->entityManager->getRepository(Department::class)->find($command->departmentId);
+    public function __invoke(CreateEmployeeCommand $command): void {
+        $department = $this->departmentRepository->find($command->departmentId);
         if (!$department) {
             throw new UnrecoverableMessageHandlingException("Department not found");
         }
