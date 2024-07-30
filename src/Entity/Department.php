@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\DepartmentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Entity;
 
-#[ORM\Entity(repositoryClass: DepartmentRepository::class)]
+#[Entity]
 class Department
 {
     #[ORM\Id]

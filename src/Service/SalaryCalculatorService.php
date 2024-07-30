@@ -12,14 +12,11 @@ class SalaryCalculatorService
         $department = $employee->getDepartment();
 
         if ($department->isPercentageBased()) {
-            //TODO: Wyjeb supplement powtorzenie
-            $supplement = $wageBase * ($department->getSupplementPercentage() / 100);
-        } else {
-            $yearsOfService = min($employee->getYearsOfService(), 10);
-            $supplement = $employee->getFixedYearlySupplementAmount() * $yearsOfService;
+            return $wageBase + (int)round($wageBase * ($department->getSupplementPercentage() / 100));
         }
-
-        return $wageBase + $supplement;
+        
+        $yearsOfService = min($employee->getYearsOfService(), 10);
+        return $wageBase + (int)round($employee->getFixedYearlySupplementAmount() * $yearsOfService);
     }
 
     public function calculateSupplement(Employee $employee): int {
